@@ -1,0 +1,91 @@
+
+@startuml
+skinparam classAttributeIconSize 0
+package "ecommerce.models" {
+  abstract class User {
+    - name: String
+    - email: String
+    - password: String
+    - role: String
+    + getName(): String
+    + setName(String)
+    + getEmail(): String
+    + setEmail(String)
+    + getPassword(): String
+    + setPassword(String)
+    + getRole(): String
+    + setRole(String)
+    + displayInfo(): void
+  }
+  class Customer extends User {
+    - address: String
+  }
+  class Employee extends User {
+    - position: String
+  }
+  abstract class Product {
+    - id: int
+    - name: String
+    - price: double
+    - stockQuantity: int
+    + reduceStock(int): boolean
+    + increaseStock(int): void
+    + displayInfo(): void
+  }
+  class Book extends Product {
+    - author: String
+    - genre: String
+  }
+  class Electronics extends Product {
+    - brand: String
+    - warrantyMonths: int
+  }
+  class Clothing extends Product {
+    - size: String
+    - material: String
+  }
+  class OrderItem {
+    - product: Product
+    - quantity: int
+    + getLineTotal(): double
+  }
+  class Order {
+    - orderId: int
+    - customer: Customer
+    - items: List<OrderItem>
+    + addItem(Product, int): void
+    + getTotalAmount(): double
+    + printReceipt(): void
+  }
+}
+package "ecommerce.store" {
+  class Store {
+    - users: List<User>
+    - products: List<Product>
+    - orders: List<Order>
+    - nextProductId: int
+    - nextOrderId: int
+    + seed(): void
+    + addUser(User): void
+    + getUsers(): List<User>
+    + findUserByEmail(String): User
+    + addProduct(Product): void
+    + getProducts(): List<Product>
+    + findProductById(int): Product
+    + addOrder(Order): void
+    + getOrders(): List<Order>
+    + nextOrderId(): int
+  }
+}
+User <|-- Customer
+User <|-- Employee
+Product <|-- Book
+Product <|-- Electronics
+Product <|-- Clothing
+Order o-- "1..*" OrderItem
+OrderItem --> Product
+Order --> Customer
+Store --> "0..*" User
+Store --> "0..*" Product
+Store --> "0..*" Order
+@enduml

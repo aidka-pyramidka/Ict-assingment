@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Console E‑Commerce System — Report</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; line-height: 1.5; max-width: 900px; margin: 40px auto; padding: 0 16px; }
+  h1,h2,h3 { margin-top: 1.2em; }
+  code, pre { background: #f6f8fa; border: 1px solid #eaecef; border-radius: 6px; padding: 8px; }
+  pre { overflow-x: auto; }
+  .box { border:1px solid #ddd; border-radius:8px; padding:16px; background:#fff; }
+  .meta { color:#555; }
+</style>
+</head>
+<body>
+<h1>Design and Implementation of a Console‑Based E‑Commerce System using Java</h1>
+<p class="meta"><strong>Student:</strong> Алимжанова Аида Олеговна<br>
+<strong>Course:</strong> Information and Communication Technologies<br>
+<strong>Date:</strong> October 27, 2025</p>
+
+<h2>1. Objective</h2>
+<p>Цель проекта — спроектировать и разработать простую консольную систему e‑commerce на Java с использованием принципов ООП: инкапсуляции, наследования и работы с коллекциями.</p>
+
+<h2>2. Requirement Analysis</h2>
+<ul>
+  <li>Пользователи: <em>Customer</em>, <em>Employee</em> на основе базового класса <em>User</em>.</li>
+  <li>Товары: <em>Book</em>, <em>Electronics</em>, <em>Clothing</em> на основе базового класса <em>Product</em>.</li>
+  <li>Заказы: <em>Order</em> содержит список позиций <em>OrderItem</em>, связан с конкретным <em>Customer</em>.</li>
+  <li>Операции: добавление пользователей/товаров, просмотр списков, оформление и просмотр заказов.</li>
+  <li>Хранение данных: коллекции <code>ArrayList</code> в классе <code>Store</code>.</li>
+  <li>Взаимодействие: текстовые меню через <code>Scanner</code>.</li>
+</ul>
+
+<h2>3. Object Modeling</h2>
+<p>Отношения включают наследование (<em>User → Customer/Employee</em>, <em>Product → Book/Electronics/Clothing</em>) и ассоциации (<em>Store</em> агрегирует пользователей, товары и заказы; <em>Order</em> агрегирует <em>OrderItem</em> и связан с <em>Customer</em>).</p>
+
+<h2>4. UML Class Diagram</h2>
+<div class="box">
+<pre>
+UML (ASCII):
++-------------------+           +------------------+
+|      User         |<----------|    Customer      |
+|-------------------|           +------------------+
+| -name             |           | -address         |
+| -email            |           +------------------+
+| -password         |           +------------------+
+| -role             |<----------|    Employee      |
+|-------------------|           +------------------+
+| +displayInfo()    |           | -position        |
++-------------------+           +------------------+
+
++-------------------+           +------------------+
+|     Product       |<----------|      Book        |
+|-------------------|           +------------------+
+| -id               |           | -author          |
+| -name             |           | -genre           |
+| -price            |           +------------------+
+| -stockQuantity    |<----------|   Electronics    |
+|-------------------|           +------------------+
+| +displayInfo()    |           | -brand           |
++-------------------+           | -warrantyMonths  |
+                                +------------------+
+                                <----------
+                                +------------------+
+                                |    Clothing      |
+                                +------------------+
+                                | -size            |
+                                | -material        |
+                                +------------------+
+
++-------------------+        +------------------+
+|      Order        |o------>|    OrderItem     |
+|-------------------|        +------------------+
+| -orderId          |        | -product         |
+| -customer         |        | -quantity        |
+| -items[]          |        +------------------+
+|-------------------|
+| +addItem()        |
+| +getTotalAmount() |
+| +printReceipt()   |
++-------------------+
+
++-------------------+
+|      Store        |
+|-------------------|
+| -users[]          |
+| -products[]       |
+| -orders[]         |
+| -nextProductId    |
+| -nextOrderId      |
+|-------------------|
+| +seed()           |
+| +addUser()        |
+| +findUserByEmail()|
+| +addProduct()     |
+| +findProductById()|
+| +addOrder()       |
+| +getOrders()      |
++-------------------+
+</pre>
+<p>PlantUML версия диаграммы прилагается в файле <code>uml.puml</code>.</p>
+</div>
+
+<h2>5. Design Notes</h2>
+<ul>
+ <li><strong>Инкапсуляция:</strong> все поля приватные; предоставлены геттеры/сеттеры.</li>
+ <li><strong>Наследование:</strong> выделены базовые абстракции <code>User</code> и <code>Product</code> с реализацией через подклассы.</li>
+ <li><strong>Полиморфизм:</strong> переопределён метод <code>displayInfo()</code> в продуктах и пользователях.</li>
+ <li><strong>Менеджмент ID:</strong> <code>Store</code> назначает ID продуктам и заказам.</li>
+ <li><strong>Валидация стока:</strong> метод <code>reduceStock()</code> предотвращает отрицательные остатки.</li>
+ <li><strong>Чеки:</strong> <code>Order.printReceipt()</code> выводит оформленный чек.</li>
+</ul>
+
+<h2>6. Implementation</h2>
+<p>Код организован по пакетам:</p>
+<pre>
+src/
+  ecommerce/app/Main.java
+  ecommerce/models/*.java
+  ecommerce/store/Store.java
+</pre>
+<p>Для демонстрации предусмотрены тестовые данные (<code>Store.seed()</code>). Доступы:</p>
+<ul>
+  <li>Сотрудник: <code>admin@shop.com / admin123</code></li>
+  <li>Клиенты: <code>alice@mail.com / 1234</code>, <code>bob@mail.com / 1234</code></li>
+</ul>
+
+<h3>Сборка и запуск</h3>
+<pre>
+cd Assignment1_ECommerce_Console_Java/src
+javac ecommerce/app/Main.java
+java ecommerce.app.Main
+</pre>
+
+<h2>7. Conclusion</h2>
+<p>Реализация соответствует требованиям: поддерживает управление пользователями и товарами, оформление заказа, инкапсуляцию данных и наследование. Диаграмма UML согласуется с кодом.</p>
+
+<h2>8. Annex: Git</h2>
+<p>Рекомендуемый шаблон коммитов и публикации:</p>
+<pre>
+git init
+git add .
+git commit -m "Assignment1: initial implementation (console e-commerce)"
+git remote add origin &lt;YOUR-REPO-URL&gt;
+git branch -M main
+git push -u origin main
+</pre>
+
+</body>
+</html>
